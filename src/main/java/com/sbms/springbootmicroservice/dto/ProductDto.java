@@ -1,4 +1,10 @@
 package com.sbms.springbootmicroservice.dto;
 
-public record ProductDto(Long id, String name, String productCode, String description) {
+import lombok.Data;
+
+@Data
+public class ProductDto{
+    String name;
+    String productCode;
+    String description;
 }
