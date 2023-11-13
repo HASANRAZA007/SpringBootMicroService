@@ -33,16 +33,16 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse register(UserDto request) {
-        Optional<User> user=userRepository.findByUserName(request.getUserName());
+        Optional<User> user=userRepository.findByEmail(request.getEmail());
         if(user.isPresent()){
             throw new CustomServiceException(200,"User is already Exist");
-        } else if(request.getUserName().isEmpty() || request.getName().isEmpty()
+        } else if(request.getEmail().isEmpty() || request.getName().isEmpty()
                 || request.getPassword().isEmpty()) {
             throw new CustomServiceException(400, "Some Data is Missing");
         }
         User user1 = modelMapper.map(request, User.class);
         user1.setPassword(passwordEncoder.encode(request.getPassword()));
-        user1.setUserName(request.getUserName());
+        user1.setEmail(request.getEmail());
         user1.setName(request.getName());
         User savedUser = userRepository.save(user1);
         String token = jwtService.generateToken(savedUser);
@@ -52,10 +52,9 @@ public class AuthenticationService {
                 .build();
     }
 
-
     public AuthenticationResponse logIn(UserSignIn request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword()));
-        User user = userRepository.findByUserName(request.getUserName()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         String token = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(token).build();
     }

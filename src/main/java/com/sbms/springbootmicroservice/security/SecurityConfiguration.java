@@ -22,11 +22,11 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
-                .csrf(csrf->csrf.ignoringRequestMatchers("/**"))
+                .csrf(csrf->csrf.ignoringRequestMatchers( "/**"))
                 .authorizeHttpRequests(authorize->authorize
-                        .requestMatchers("/swagger-ui.html","/**")
+                        .requestMatchers("/swagger-ui.html/**","/**")
                         .permitAll()
-                        .anyRequest()
+                        .requestMatchers("/api/v1/users/**")
                         .authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

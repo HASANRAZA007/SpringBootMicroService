@@ -1,7 +1,7 @@
 package com.sbms.springbootmicroservice.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -10,16 +10,19 @@ import java.util.Collection;
 @Data
 @Entity
 @Table(name = "user")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "user_name", unique = true)
-    private String userName;
-    @Column(name = "password")
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
+    @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Override
@@ -28,7 +31,7 @@ public class User implements UserDetails {
     }
     @Override
     public String getUsername() {
-        return userName;
+        return email;
     }
 
     @Override
@@ -50,4 +53,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

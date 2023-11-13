@@ -9,38 +9,47 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
-    private  final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
     private  final UserRepository userRepository;
     @Autowired
-    public UserService(ModelMapper modelMapper, UserRepository userRepository) {
-        this.modelMapper = modelMapper;
+    public UserService(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
-    public UserDto updateUser(UserDto userDto){
-        User user=userRepository.findUserByUserName(userDto.getUserName());
+    public UserDtoResponse updateUser(UserDto userDto){
+        User user=userRepository.findUserByEmail(userDto.getEmail());
+        UserDtoResponse response = new UserDtoResponse();
         if(user!=null){
             user.setId(user.getId());
-            user.setUserName(userDto.getUserName());
+            user.setEmail(user.getEmail());
             user.setName(userDto.getName());
             user.setPassword(userDto.getPassword());
             userRepository.save(user);
-            return this.modelMapper.map(user,UserDto.class);
+            response.setSuccess(true);
+            response.setMessage("User updated successfully");
+            response.setUserDto(this.modelMapper.map(user, UserDto.class));
         }else {
-            throw new CustomServiceException(404,"User Not Exist");
+            response.setSuccess(false);
+            response.setMessage("User not found");
         }
+        return response;
     }
-    public UserDto getUser(String userName) {
-        Optional<User> user=userRepository.findByUserName(userName);
-        if (user.isPresent()){
-            return this.modelMapper.map(user, UserDto.class);
+    public UserDtoResponse getUser(String userName) {
+        User user=userRepository.findUserByEmail(userName);
+        UserDtoResponse response = new UserDtoResponse();
+        if (user!=null){
+            response.setSuccess(true);
+            response.setMessage("User Get Successfully");
+            response.setUserDto(this.modelMapper.map(user, UserDto.class));
         }
         else {
-            throw new CustomServiceException(404,"User Not Found");
+            response.setSuccess(false);
+            response.setMessage("User not found");
         }
+        return response;
     }
     public List<UserDto> getAllUsers(){
         List<User> userList=userRepository.findAll();
@@ -52,5 +61,19 @@ public class UserService {
         }else {
             return userDtoList;
         }
+    }
+    public UserDtoResponse deleteUser(String userName){
+        User user=userRepository.findUserByEmail(userName);
+        UserDtoResponse response=new UserDtoResponse();
+        if(user!=null){
+            userRepository.deleteUserByEmail(userName);
+            response.setSuccess(true);
+            response.setMessage("User Deleted Successfully");
+        }
+        else {
+            response.setSuccess(false);
+            response.setMessage("User not found");
+        }
+        return response;
     }
 }
