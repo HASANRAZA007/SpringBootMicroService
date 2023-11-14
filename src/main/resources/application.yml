@@ -17,3 +17,6 @@ spring:
 logging:
   level:
     org.springframework.security: DEBUG
+springdoc:
+  swagger-ui:
+    path: ${SWAGGER_UI_PATH:/swagger-ui.html}
